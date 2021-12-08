@@ -48,7 +48,7 @@ namespace GuestBook.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Users.Add(user);
+                _context.Add(user);
                 _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
