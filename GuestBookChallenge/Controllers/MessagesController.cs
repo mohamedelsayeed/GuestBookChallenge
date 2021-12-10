@@ -146,7 +146,7 @@ namespace GuestBookChallenge.Controllers
             return View(message);
         }
 
-
+       
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind("Id,Title,Body,UserId")] Message message)
@@ -215,6 +215,26 @@ namespace GuestBookChallenge.Controllers
         private bool MessageExists(int id)
         {
             return _context.Messages.Any(e => e.Id == id);
+        }
+
+
+        [HttpGet]
+        public IActionResult GetData(int? id=2)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var reply = _context.Replys.Where(a=>a.MessageId ==  id).Include(a => a.User).ToList();
+            if (reply == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("_reply", reply);
+
+           
         }
     }
     public class ReplyVM

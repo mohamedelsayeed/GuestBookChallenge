@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Views\Home\Components\" />
     <Folder Include="wwwroot\Uploads\" />
   </ItemGroup>
 

@@ -17,6 +17,10 @@
 
 </head>
 <body>
+    @{
+    int loggedUser =ViewData["UserId"] != null?  int.Parse(ViewData["UserId"].ToString()) : 0;
+
+}
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
@@ -33,6 +37,24 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @if(@loggedUser != 0)
+                        {
+                              <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Index" asp-action="Messages">Privacy</a>
+                            </li>
+
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Login">Login</a>
+                        </li>
+                         <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Account" asp-action="Register">Register</a>
+                        </li>
+                        }
+                        
+
                     </ul>
                 </div>
             </div>
@@ -57,5 +79,9 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    <script>
+
+    
+</script>
 </body>
 </html>

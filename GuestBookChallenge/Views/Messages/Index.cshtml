@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Index";
     int loggedUser = int.Parse(ViewData["UserId"].ToString());
+
 }
 
 <h1>Index</h1>
@@ -21,49 +22,86 @@
                     <div class="cardbox shadow-lg bg-white">
 
                         <div class="cardbox-heading">
-                            @if(item.UserId == loggedUser)
+                            @if (item.UserId == loggedUser)
                             {
-                                                            <div class="dropdown float-right">
-                                <button class="btn btn-flat btn-flat-icon " type="button" data-toggle="dropdown" aria-expanded="false">
-                                    <em class="fa fa-ellipsis-h"></em>
-                                </button>
+                                <div class="dropdown float-right">
+                                    <button class="btn btn-flat btn-flat-icon " type="button" data-toggle="dropdown" aria-expanded="false">
+                                        <em class="fa fa-ellipsis-h"></em>
+                                    </button>
 
-                                <div class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
-                                    <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">Edit </a>
-                                    <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">Details</a>
-                                    <a class="dropdown-item" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                    <div class="dropdown-menu dropdown-scale dropdown-menu-right" role="menu" style="position: absolute; transform: translate3d(-136px, 28px, 0px); top: 0px; left: 0px; will-change: transform;">
+                                        <a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">Edit </a>
+                                        <a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">Details</a>
+                                        <a class="dropdown-item" asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                                    </div>
+                                </div>
+                            }
+                            <div class="media-block">
+                                <a class="media-left" href="#">
+                                    @*<img class="img-circle img-sm" alt="Profile Picture" src="https://bootdey.com/img/Content/avatar/avatar1.png">*@
+                                </a>
+                                @if (string.IsNullOrEmpty(item.User.ProfilePic))
+                                {
+                                    <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/avatar.jpg" alt="User"></a>
+                                }
+                                else
+                                {
+                                    <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/@item.User.ProfilePic" alt="User"></a>
+
+                                }
+                                <div class="media-body">
+                                    <div class="mar-btm">
+                                        <a href="#" class="btn-link text-semibold media-heading box-inline">@item.User.Name</a>
+                                        <p class="text-muted text-sm"><i class="fa fa-mobile fa-lg"></i> - @((DateTime.Now - item.CreatedDate).TotalMinutes))  min ago</p>
+                                    </div>
+                                    <p>@item.Title</p>
+
+                                    <h1>@item.Body</h1>
+                                    @if (!string.IsNullOrEmpty(item.Pic))
+                                    {
+                                        <img class="img-responsive thumbnail" src="~/Uploads/@item.Pic" alt="@item.Pic">
+
+                                    }
+
+                                    <div class="pad-ver">
+                                        <div class="btn-group">
+                                            <a class="btn btn-sm btn-default btn-hover-success" href="#"><i class="fa fa-thumbs-up"></i></a>
+                                            <a class="btn btn-sm btn-default btn-hover-danger" href="#"><i class="fa fa-thumbs-down"></i></a>
+                                        </div>
+                                        <a class="btn btn-sm btn-default btn-hover-primary" href="#">Comment</a>
+                                    </div>
+                                    <hr>
                                 </div>
                             </div>
-                            }
 
-                        <div class="media m-0">
+                            @* <div class="media m-0">
                                 <div class="d-flex mr-3">
-                                    @if (string.IsNullOrEmpty(item.User.ProfilePic))
-                                    {
-                                        <a href=""><img class="img-fluid rounded-circle" src="~/Uploads/avatar.jpg" alt="User"></a>
-                                    }
-                                    else
-                                    {
-                                        <a href=""><img class="img-fluid rounded-circle" src="~/Uploads/@item.User.ProfilePic" alt="User"></a>
+                                @if (string.IsNullOrEmpty(item.User.ProfilePic))
+                                {
+                                <a href=""><img class="img-fluid rounded-circle" src="~/Uploads/avatar.jpg" alt="User"></a>
+                                }
+                                else
+                                {
+                                <a href=""><img class="img-fluid rounded-circle" src="~/Uploads/@item.User.ProfilePic" alt="User"></a>
 
-                                    }
+                                }
                                 </div>
                                 <div class="media-body">
-                                    <p class="m-0">@Html.DisplayFor(modelItem => item.User.Name)</p>
-                                    <small><span><i class="icon ion-md-pin"></i>  @Html.DisplayFor(modelItem => item.Title)</span></small>
-                                    <small><span><i class="icon ion-md-time"></i> @Html.DisplayFor(modelItem => item.CreatedDate)</span></small>
+                                <p class="m-0">@Html.DisplayFor(modelItem => item.User.Name)</p>
+                                <small><span><i class="icon ion-md-pin"></i>  @Html.DisplayFor(modelItem => item.Title)</span></small>
+                                <small><span><i class="icon ion-md-time"></i> @Html.DisplayFor(modelItem => item.CreatedDate)</span></small>
                                 </div>
 
-                            </div>
+                                </div>*@
                         </div>
 
-                        <div class="cardbox-item">
+                        @*        <div class="cardbox-item">
                             @Html.DisplayFor(modelItem => item.Body)
                             @if (!string.IsNullOrEmpty(item.Pic))
                             {
-                                <img class="img-fluid" src="~/Uploads/@item.Pic" alt="Image">
+                            <img class="img-fluid" src="~/Uploads/@item.Pic" alt="Image">
                             }
-                        </div>
+                            </div>*@
 
                         <div class="cardbox-comments">
                             <span class="comment-avatar float-left">
@@ -77,55 +115,78 @@
 
                                 }
                             </span>
+                            <div class="panel">
+                                <div class="panel-body">
+                                     <form id="replyForm_@item.Id">
+                                          <input type="hidden" name="MessageId" value="@item.Id">
+                                    <input type="hidden" name="UserId" value="@item.UserId">
+
+                                    <textarea name="Body" type="text" class="form-control" rows="2" placeholder="What are you thinking?"></textarea>
+                                    <div class="mar-top clearfix">
+                                        <button class="btn btn-sm btn-primary pull-right" onclick="addReply(@item.Id);" type="button"><i class="fa fa-pencil fa-fw"></i> Share</button>
+                                        <a class="btn btn-trans btn-icon fa fa-camera add-tooltip" href="#">
+                                            <input type="file" id="Pic_@item.Id" name="Pic" class="form-control" accept=".png, .jpg" />
+                                        </a>
+                                    </div>
+                                    </form>
+                                </div>
+                            </div>
                             <div class="search">
-                                <form asp-action="AddReply" enctype="multipart/form-data">
+                                <form id="replyForm_@item.Id">
                                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                                     <input type="hidden" name="MessageId" value="@item.Id">
                                     <input type="hidden" name="UserId" value="@item.UserId">
                                     <div class="form-group">
-                                        @*<label asp-for="Body" class="control-label"></label>*@
                                         <input type="text" name="Body" class="form-control" />
-                                        @*<span asp-validation-for="Body" class="text-danger"></span>*@
                                     </div>
-                                    
-                                    <div class="form-group">
-                                      
-                                        <input type="file" id="Pic" name="Pic" class="form-control" accept=".png, .jpg" />
-                                       
 
+                                    <div class="form-group">
+                                        <input type="file" id="Pic_@item.Id" name="Pic" class="form-control" accept=".png, .jpg" />
                                     </div>
                                     <div class="form-group">
-                                        <input type="submit" value="Add Reply" class="btn btn-primary" />
+                                        <input type="button" onclick="addReply(@item.Id);" value="Add Reply" class="btn btn-primary" />
                                     </div>
                                 </form>
-                                
+
                             </div>
                         </div>
 
+
                         @if (item.Replies != null && item.Replies.Count() > 0)
                         {
-                            <div class="cardbox-comments">
-                                @foreach (var reply in item.Replies.OrderByDescending(a=>a.CreatedDate))
-                                {
-                                    <span class="comment-avatar float-left">
-                                        @if (string.IsNullOrEmpty(reply.User.ProfilePic))
-                                        {
-                                            <a href=""><img class="rounded-circle" src="~/Uploads/avatar.jpg" alt="User"></a>
-                                        }
-                                        else
-                                        {
-                                            <a href=""><img class="rounded-circle" src="~/Uploads/@reply.User.ProfilePic" alt="User"></a>
 
-                                        }
-                                    </span>
-                                    <div class="search">
-                                        <input value="@reply.Body" disabled type="text">
+                            <div class="media-block pad-all">
+
+                                @foreach (var reply in Model.OrderByDescending(a => a.CreatedDate))
+                                {
+                                    <hr>
+
+                                    @if (string.IsNullOrEmpty(reply.User.ProfilePic))
+                                    {
+                                        <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/avatar.jpg" alt="User"></a>
+                                    }
+                                    else
+                                    {
+                                        <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/@reply.User.ProfilePic" alt="User"></a>
+
+                                    }
+                                    <div class="media-body">
+                                        <div class="mar-btm">
+                                            <a href="#" class="btn-link text-semibold media-heading box-inline">@reply.User.Name</a>
+                                            <p class="text-muted text-sm"><i class="fa fa-globe fa-lg"></i> - @((DateTime.Now - reply.CreatedDate).TotalMinutes))  min ago</p>
+                                        </div>
+                                        <p>@reply.Body</p>
                                         @if (!string.IsNullOrEmpty(reply.Pic))
                                         {
-                                            <img src="~/Uploads/@reply.Pic" width=100 height=100>
+                                            <img class="img-responsive thumbnail" src="~/Uploads/@reply.Pic" alt="@reply.Pic">
+
                                         }
+
                                     </div>
+
                                 }
+                                <hr>
+
                             </div>
                         }
                     </div>
@@ -133,6 +194,165 @@
             }
         </div>
     </div>
+    <div class="row">
+
+        <div class="container col-lg-6">
+            <div class="d-flex justify-content-center row">
+                <div class="d-flex flex-column col-md-8">
+                    <div class="d-flex flex-row align-items-center text-left comment-top p-2 bg-white border-bottom px-4">
+                        <div class="profile-image"><img class="rounded-circle" src="https://i.imgur.com/t9toMAQ.jpg" width="70"></div>
+                        <div class="d-flex flex-column-reverse flex-grow-0 align-items-center votings ml-1"><i class="fa fa-sort-up fa-2x hit-voting"></i><span>127</span><i class="fa fa-sort-down fa-2x hit-voting"></i></div>
+                        <div class="d-flex flex-column ml-3">
+                            <div class="d-flex flex-row post-title">
+                                <h5>Is sketch 3.9.1 stable?</h5><span class="ml-2">(Jesshead)</span>
+                            </div>
+                            <div class="d-flex flex-row align-items-center align-content-center post-title"><span class="bdge mr-1">video</span><span class="mr-2 comments">13 comments&nbsp;</span><span class="mr-2 dot"></span><span>6 hours ago</span></div>
+                        </div>
+                    </div>
+                    <div class="coment-bottom bg-white p-2 px-4">
+                        <div class="d-flex flex-row add-comment-section mt-4 mb-4">
+                            <img class="img-fluid img-responsive rounded-circle mr-2" src="https://i.imgur.com/qdiP4DB.jpg" width="38">
+                            <input type="text" class="form-control mr-3" placeholder="Add comment">
+                            <button class="btn btn-primary" type="button">Comment</button>
+                        </div>
+                        <hr />
+
+                        <div class="commented-section mt-2">
+                            <div class="d-flex flex-row align-items-center commented-user">
+                                <h5 class="mr-2">Corey oates</h5><span class="dot mb-1"></span><span class="mb-1 ml-2">4 hours ago</span>
+                            </div>
+                            <div class="comment-text-sm"><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span></div>
+                            <div class="reply-section">
+                                <div class="d-flex flex-row align-items-center voting-icons">
+                                    <i class="fa fa-sort-up fa-2x mt-3 hit-voting"></i><i class="fa fa-sort-down fa-2x mb-3 hit-voting"></i><span class="ml-2">10</span><span class="dot ml-2"></span>
+                                    <h6 class="ml-2 mt-1">Reply</h6>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container col-lg-6">
+            <div class="d-flex justify-content-center row">
+                <div class="d-flex flex-column col-md-8">
+                    <div class="d-flex flex-row align-items-center text-left comment-top p-2 bg-white border-bottom px-4">
+                        <div class="profile-image"><img class="rounded-circle" src="https://i.imgur.com/t9toMAQ.jpg" width="70"></div>
+                        <div class="d-flex flex-column-reverse flex-grow-0 align-items-center votings ml-1"><i class="fa fa-sort-up fa-2x hit-voting"></i><span>127</span><i class="fa fa-sort-down fa-2x hit-voting"></i></div>
+                        <div class="d-flex flex-column ml-3">
+                            <div class="d-flex flex-row post-title">
+                                <h5>Is sketch 3.9.1 stable?</h5><span class="ml-2">(Jesshead)</span>
+                            </div>
+                            <div class="d-flex flex-row align-items-center align-content-center post-title"><span class="bdge mr-1">video</span><span class="mr-2 comments">13 comments&nbsp;</span><span class="mr-2 dot"></span><span>6 hours ago</span></div>
+                        </div>
+                    </div>
+                    <div class="coment-bottom bg-white p-2 px-4">
+                        <div class="d-flex flex-row add-comment-section mt-4 mb-4"><img class="img-fluid img-responsive rounded-circle mr-2" src="https://i.imgur.com/qdiP4DB.jpg" width="38"><input type="text" class="form-control mr-3" placeholder="Add comment"><button class="btn btn-primary" type="button">Comment</button></div>
+                        <div class="commented-section mt-2">
+                            <div class="d-flex flex-row align-items-center commented-user">
+                                <h5 class="mr-2">Corey oates</h5><span class="dot mb-1"></span><span class="mb-1 ml-2">4 hours ago</span>
+                            </div>
+                            <div class="comment-text-sm"><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</span></div>
+                            <div class="reply-section">
+                                <div class="d-flex flex-row align-items-center voting-icons">
+                                    <i class="fa fa-sort-up fa-2x mt-3 hit-voting"></i><i class="fa fa-sort-down fa-2x mb-3 hit-voting"></i><span class="ml-2">10</span><span class="dot ml-2"></span>
+                                    <h6 class="ml-2 mt-1">Reply</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="commented-section mt-2">
+                            <div class="d-flex flex-row align-items-center commented-user">
+                                <h5 class="mr-2">Samoya Johns</h5><span class="dot mb-1"></span><span class="mb-1 ml-2">5 hours ago</span>
+                            </div>
+                            <div class="comment-text-sm"><span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua..</span></div>
+                            <div class="reply-section">
+                                <div class="d-flex flex-row align-items-center voting-icons">
+                                    <i class="fa fa-sort-up fa-2x mt-3 hit-voting"></i><i class="fa fa-sort-down fa-2x mb-3 hit-voting"></i><span class="ml-2">15</span><span class="dot ml-2"></span>
+                                    <h6 class="ml-2 mt-1">Reply</h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="commented-section mt-2">
+                            <div class="d-flex flex-row align-items-center commented-user">
+                                <h5 class="mr-2">Makhaya andrew</h5><span class="dot mb-1"></span><span class="mb-1 ml-2">10 hours ago</span>
+                            </div>
+                            <div class="comment-text-sm"><span>Nunc sed id semper risus in hendrerit gravida rutrum. Non odio euismod lacinia at quis risus sed. Commodo ullamcorper a lacus vestibulum sed arcu non odio euismod. Enim facilisis gravida neque convallis a. In mollis nunc sed id. Adipiscing elit pellentesque habitant morbi tristique senectus et netus. Ultrices mi tempus imperdiet nulla malesuada pellentesque.</span></div>
+                            <div class="reply-section">
+                                <div class="d-flex flex-row align-items-center voting-icons">
+                                    <i class="fa fa-sort-up fa-2x mt-3 hit-voting"></i><i class="fa fa-sort-down fa-2x mb-3 hit-voting"></i><span class="ml-2">25</span><span class="dot ml-2"></span>
+                                    <h6 class="ml-2 mt-1">Reply</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
+<div class="modal" id="myModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="modalPar"></p>
+            </div>
 
+        </div>
+    </div>
+</div>
+@section Scripts {
+
+
+<script>
+    function RenderMessage(id){
+      $.ajax({
+        url: '/Messages/GetData?id=' + id,
+        type: 'GET',
+        success: function (data) {
+         $('#replyPartial_'+id).empty();
+
+            $('#replyPartial_'+id).html(data);
+        }
+    });
+    }
+    function addReply(formid){
+       _formdata = new FormData();
+        $(`#replyForm_${formid} input,select,textarea`).each(function () {
+             _formdata.append($(this).attr('name'), $(this).val());
+             console.log($(this).attr('name') +" "+ $(this).val());
+        });
+        var picFile = document.getElementById('Pic_'+ formid).files[0];
+        _formdata.append("Pic", picFile);
+
+        $.ajax({
+            url: "/Messages/AddReply",
+            data: _formdata,
+            type: 'POST',
+            dataType: 'json',
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                $(`#replyForm_${formid}`)[0].reset();
+                document.getElementById('modalPar').innerHTML = data
+                $('#myModal').modal('toggle')
+                 setTimeout(function () {
+                    $('#myModal').modal('toggle');
+                }, 2000);
+                RenderMessage(formid)
+
+
+            }
+        });
+    }
+
+
+</script>
+}

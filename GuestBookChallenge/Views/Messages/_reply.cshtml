@@ -1,0 +1,61 @@
+﻿  @model IEnumerable<GuestBookChallenge.Models.Reply>
+
+
+@if (Model != null && Model.Count() > 0)
+{
+        <div class="media-block pad-all">
+
+        @foreach (var reply in Model.OrderByDescending(a => a.CreatedDate))
+        {
+
+            @if (string.IsNullOrEmpty(reply.User.ProfilePic))
+            {
+                <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/avatar.jpg" alt="User"></a>
+            }
+            else
+            {
+                <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/@reply.User.ProfilePic" alt="User"></a>
+
+            }
+            <div class="media-body">
+                <div class="mar-btm">
+                    <a href="#" class="btn-link text-semibold media-heading box-inline">@reply.User.Name</a>
+                    <p class="text-muted text-sm"><i class="fa fa-globe fa-lg"></i> - @((DateTime.Now - reply.CreatedDate).TotalMinutes))  min ago</p>
+                </div>
+                <p>@reply.Body</p>
+                @if (!string.IsNullOrEmpty(reply.Pic))
+                {
+                    <img class="img-responsive thumbnail" src="~/Uploads/@reply.Pic" alt="@reply.Pic">
+
+                }
+              
+            </div>
+
+        }
+    </div>
+
+    @*<div class="cardbox-comments">
+        @foreach (var reply in Model.OrderByDescending(a => a.CreatedDate))
+        {
+
+            <span class="comment-avatar float-left">
+                @if (string.IsNullOrEmpty(reply.User.ProfilePic))
+                {
+                    <a href=""><img class="rounded-circle" src="~/Uploads/avatar.jpg" alt="User"></a>
+                }
+                else
+                {
+                    <a href=""><img class="rounded-circle" src="~/Uploads/@reply.User.ProfilePic" alt="User"></a>
+
+                }
+            </span>
+            <div class="search">
+                <input value="@reply.Body" disabled type="text">
+                @if (!string.IsNullOrEmpty(reply.Pic))
+                {
+                    <img src="~/Uploads/@reply.Pic" width=100 height=100>
+                }
+            </div>
+        }
+    </div>*@
+}
