@@ -5,22 +5,26 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using GuestBook.Models;
+using GuestBookChallenge.Models;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace GuestBookChallenge.Controllers
 {
     public class MessagesController : Controller
     {
         private readonly AppDbContext _context;
+        private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _appEnvironment;
 
-        public MessagesController(AppDbContext context)
+        public MessagesController(AppDbContext context, IHostingEnvironment appEnvironment)
         {
             _context = context;
+            _appEnvironment = appEnvironment;
         }
 
         public IActionResult Index()
         {
-            var appDbContext = _context.Messages.Include(m => m.User).ToList();
+            var appDbContext = _context.Messages.Include(m => m.User).ThenInclude(m => m.Replies).ToList();
             return View(appDbContext);
         }
 
@@ -33,7 +37,7 @@ namespace GuestBookChallenge.Controllers
 
             var message = _context.Messages
                 .Include(m => m.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefault(m => m.Id == id);
             if (message == null)
             {
                 return NotFound();
@@ -48,14 +52,43 @@ namespace GuestBookChallenge.Controllers
             return View();
         }
 
-       [HttpPost]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Message message)
         {
+            var files = HttpContext.Request.Form.Files;
+            var fileName = "";
+            if (files.FirstOrDefault() != null)
+            {
+                var pic = files.FirstOrDefault();
+                var allowedExten = new List<string> { ".jpg", ".png" };
+                if (!allowedExten.Contains(Path.GetExtension(pic.FileName).ToLower()))
+                {
+                    ModelState.AddModelError("Pic", "Only png and jpg files are allowed");
+                    ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
+                    return View(message);
+                }
+                if (pic.Length > 1048576)
+                {
+                    ModelState.AddModelError("Pic", "Only can't be more than 1 MB");
+                    ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
+                    return View(message);
+                }
+                var uploads = Path.Combine(_appEnvironment.WebRootPath, "Uploads");
+
+                 fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(pic.FileName);
+                using var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create);
+                    
+                pic.CopyTo(fileStream);
+              
+
+            }
             if (ModelState.IsValid)
             {
+                message.CreatedDate = DateTime.Now;
+                message.Pic = fileName;
                 _context.Add(message);
-                _context.SaveChangesAsync();
+                _context.SaveChanges();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
@@ -93,7 +126,7 @@ namespace GuestBookChallenge.Controllers
                 try
                 {
                     _context.Update(message);
-                    _context.SaveChangesAsync();
+                    _context.SaveChanges();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -121,7 +154,7 @@ namespace GuestBookChallenge.Controllers
 
             var message = _context.Messages
                 .Include(m => m.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefault(m => m.Id == id);
             if (message == null)
             {
                 return NotFound();
@@ -135,6 +168,10 @@ namespace GuestBookChallenge.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             var message = _context.Messages.Find(id);
+            var replies = _context.Replys.Where(a=>a.MessageId == id);
+
+            _context.Replys.RemoveRange(replies);
+
             _context.Messages.Remove(message);
             _context.SaveChanges();
             return RedirectToAction(nameof(Index));

@@ -1,4 +1,4 @@
-using GuestBook.Models;
+using GuestBookChallenge.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,6 +30,6 @@ app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}");
+    pattern: "{controller=Messages}/{action=Index}/{id?}");
 
 app.Run();

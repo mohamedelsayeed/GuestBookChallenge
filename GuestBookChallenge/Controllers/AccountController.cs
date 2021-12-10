@@ -1,7 +1,7 @@
-﻿using GuestBook.Models;
+﻿using GuestBookChallenge.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GuestBook.Controllers
+namespace GuestBookChallenge.Controllers
 {
     public class AccountController : Controller
     {

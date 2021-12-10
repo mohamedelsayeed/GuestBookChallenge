@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace GuestBook.Models
+namespace GuestBookChallenge.Models
 {
     public class User
     {
@@ -18,5 +18,8 @@ namespace GuestBook.Models
         public string Password { get; set; }
         [Display(Name = "Profile Pic")]
         public string? ProfilePic { get; set; }
+        public virtual ICollection<Message> Messages { get; set; }
+        public virtual ICollection<Reply> Replies { get; set; }
+
     }
 }
