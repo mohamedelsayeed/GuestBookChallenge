@@ -28,8 +28,8 @@ namespace GuestBookChallenge.Controllers
                 var user = _context.Users.FirstOrDefault(a => a.UserName == username && a.Password == password);
                 if (user != null)
                 {
-                    HttpContext.Session.SetString("username", username);
-                    return View("Success");
+                    HttpContext.Session.SetInt32("UID", user.Id);
+                    return RedirectToAction("Index","Messages");
                 }
             }
 
@@ -38,7 +38,8 @@ namespace GuestBookChallenge.Controllers
 
         }
         [HttpGet]
-        public IActionResult Register() { 
+        public IActionResult Register()
+        {
             return View();
         }
 

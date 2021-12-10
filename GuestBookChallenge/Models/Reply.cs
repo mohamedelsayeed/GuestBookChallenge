@@ -11,6 +11,7 @@ namespace GuestBookChallenge.Models
         [Required, MaxLength(2500)]
         public string Body { get; set; }
         public string? Pic { get; set; }
+        public DateTime CreatedDate { get; set; }
 
         [ForeignKey("User")]
         public int? UserId { get; set; }

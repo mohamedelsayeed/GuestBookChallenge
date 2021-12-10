@@ -7,7 +7,9 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(connectionString));
-
+builder.Services.AddSession(options => {
+    options.IdleTimeout = TimeSpan.FromMinutes(10);
+});
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -23,6 +25,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseSession();
 
 app.UseRouting();
 

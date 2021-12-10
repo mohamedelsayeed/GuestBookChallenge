@@ -24,6 +24,12 @@ namespace GuestBookChallenge.Controllers
 
         public IActionResult Index()
         {
+            var uid = HttpContext.Session.GetInt32("UID");
+            if(uid == null)
+            {
+                return RedirectToAction("Login","Account");
+            }
+            ViewData["UserId"]  = uid;
             var appDbContext = _context.Messages.Include(m => m.User).ThenInclude(m => m.Replies).ToList();
             return View(appDbContext);
         }
@@ -94,7 +100,36 @@ namespace GuestBookChallenge.Controllers
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
             return View(message);
         }
+        [HttpPost]
+        public IActionResult AddReply(ReplyVM reply)
+        {
+            var files = HttpContext.Request.Form.Files;
+            var fileName = "";
+            if (files.FirstOrDefault() != null)
+            {
+                var pic = files.FirstOrDefault();
+                var allowedExten = new List<string> { ".jpg", ".png" };
 
+                var uploads = Path.Combine(_appEnvironment.WebRootPath, "Uploads");
+
+                fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(pic.FileName);
+                using var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create);
+
+                pic.CopyTo(fileStream);
+
+
+            }
+            var replyObj = new Reply();
+            replyObj.Body = reply.Body;
+            replyObj.MessageId = reply.MessageId;
+            replyObj.UserId = reply.UserId;
+            replyObj.CreatedDate = DateTime.Now;
+            replyObj.Pic = fileName;
+
+            _context.Add(replyObj);
+            _context.SaveChanges();
+            return Json("Saved");
+        }
         public IActionResult Edit(int? id)
         {
             if (id == null)
@@ -181,5 +216,12 @@ namespace GuestBookChallenge.Controllers
         {
             return _context.Messages.Any(e => e.Id == id);
         }
+    }
+    public class ReplyVM
+    {
+        public int MessageId { get; set; }
+        public int UserId { get; set; }
+        public string Body { get; set; }
+        public string Pic { get; set; }
     }
 }
