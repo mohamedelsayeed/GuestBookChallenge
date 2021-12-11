@@ -103,32 +103,40 @@ namespace GuestBookChallenge.Controllers
         [HttpPost]
         public IActionResult AddReply(ReplyVM reply)
         {
-            var files = HttpContext.Request.Form.Files;
-            var fileName = "";
-            if (files.FirstOrDefault() != null)
+            try
             {
-                var pic = files.FirstOrDefault();
-                var allowedExten = new List<string> { ".jpg", ".png" };
+                var files = HttpContext.Request.Form.Files;
+                var fileName = "";
+                if (files.FirstOrDefault() != null)
+                {
+                    var pic = files.FirstOrDefault();
+                    var allowedExten = new List<string> { ".jpg", ".png" };
 
-                var uploads = Path.Combine(_appEnvironment.WebRootPath, "Uploads");
+                    var uploads = Path.Combine(_appEnvironment.WebRootPath, "Uploads");
 
-                fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(pic.FileName);
-                using var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create);
+                    fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(pic.FileName);
+                    using var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create);
 
-                pic.CopyTo(fileStream);
+                    pic.CopyTo(fileStream);
 
 
+                }
+                var replyObj = new Reply();
+                replyObj.Body = reply.Body;
+                replyObj.MessageId = reply.MessageId;
+                replyObj.UserId = reply.UserId;
+                replyObj.CreatedDate = DateTime.Now;
+                replyObj.Pic = fileName;
+
+                _context.Add(replyObj);
+                _context.SaveChanges();
             }
-            var replyObj = new Reply();
-            replyObj.Body = reply.Body;
-            replyObj.MessageId = reply.MessageId;
-            replyObj.UserId = reply.UserId;
-            replyObj.CreatedDate = DateTime.Now;
-            replyObj.Pic = fileName;
-
-            _context.Add(replyObj);
-            _context.SaveChanges();
-            return Json("Saved");
+            catch (Exception ex)
+            {
+                //log exception
+                return Json("0");
+            }
+            return Json("1");
         }
         public IActionResult Edit(int? id)
         {

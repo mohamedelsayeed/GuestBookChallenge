@@ -20,7 +20,7 @@
             <div class="media-body">
                 <div class="mar-btm">
                     <a href="#" class="btn-link text-semibold media-heading box-inline">@reply.User.Name</a>
-                    <p class="text-muted text-sm"><i class="fa fa-globe fa-lg"></i> - @((DateTime.Now - reply.CreatedDate).TotalMinutes))  min ago</p>
+                    <p class="text-muted text-sm"><i class="fa fa-globe fa-lg"></i> - @((DateTime.Now - reply.CreatedDate)))  min ago</p>
                 </div>
                 <p>@reply.Body</p>
                 @if (!string.IsNullOrEmpty(reply.Pic))
