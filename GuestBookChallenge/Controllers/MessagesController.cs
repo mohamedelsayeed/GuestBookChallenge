@@ -59,46 +59,55 @@ namespace GuestBookChallenge.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public IActionResult Create(Message message)
         {
-            var files = HttpContext.Request.Form.Files;
-            var fileName = "";
-            if (files.FirstOrDefault() != null)
+            try
             {
-                var pic = files.FirstOrDefault();
-                var allowedExten = new List<string> { ".jpg", ".png" };
-                if (!allowedExten.Contains(Path.GetExtension(pic.FileName).ToLower()))
+                var files = HttpContext.Request.Form.Files;
+                var fileName = "";
+                if (files.FirstOrDefault() != null)
                 {
-                    ModelState.AddModelError("Pic", "Only png and jpg files are allowed");
-                    ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
-                    return View(message);
+                    var pic = files.FirstOrDefault();
+                    var allowedExten = new List<string> { ".jpg", ".png" };
+                    if (!allowedExten.Contains(Path.GetExtension(pic.FileName).ToLower()))
+                    {
+                        ModelState.AddModelError("Pic", "Only png and jpg files are allowed");
+                        ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
+                        return View(message);
+                    }
+                    if (pic.Length > 1048576)
+                    {
+                        ModelState.AddModelError("Pic", "Only can't be more than 1 MB");
+                        ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
+                        return View(message);
+                    }
+                    var uploads = Path.Combine(_appEnvironment.WebRootPath, "Uploads");
+
+                    fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(pic.FileName);
+                    using var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create);
+
+                    pic.CopyTo(fileStream);
+
+
                 }
-                if (pic.Length > 1048576)
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("Pic", "Only can't be more than 1 MB");
-                    ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
-                    return View(message);
+                    message.CreatedDate = DateTime.Now;
+                    message.Pic = fileName;
+                    _context.Add(message);
+                    _context.SaveChanges();
                 }
-                var uploads = Path.Combine(_appEnvironment.WebRootPath, "Uploads");
-
-                 fileName = Guid.NewGuid().ToString().Replace("-", "") + Path.GetExtension(pic.FileName);
-                using var fileStream = new FileStream(Path.Combine(uploads, fileName), FileMode.Create);
-                    
-                pic.CopyTo(fileStream);
-              
-
             }
-            if (ModelState.IsValid)
+            catch (Exception ex)
             {
-                message.CreatedDate = DateTime.Now;
-                message.Pic = fileName;
-                _context.Add(message);
-                _context.SaveChanges();
-                return RedirectToAction(nameof(Index));
+
+                return Json("-1");
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name", message.UserId);
-            return View(message);
+            var uid = HttpContext.Session.GetInt32("UID");
+            
+            //ViewData["UserId"] = uid;
+            //var model = _context.Messages.Where(a=>a.Id == message.Id).Include(a=>a.User).ThenInclude(a=>a.Replies).FirstOrDefault();
+            return Json(message.Id, new Newtonsoft.Json.JsonSerializerSettings());
         }
         [HttpPost]
         public IActionResult AddReply(ReplyVM reply)
@@ -136,6 +145,7 @@ namespace GuestBookChallenge.Controllers
                 //log exception
                 return Json("0");
             }
+
             return Json("1");
         }
         public IActionResult Edit(int? id)
@@ -243,6 +253,24 @@ namespace GuestBookChallenge.Controllers
             return PartialView("_reply", reply);
 
            
+        }
+        [HttpGet]
+        public IActionResult GetMessage(int? id = 2)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var message = _context.Messages.Where(a => a.Id == id).Include(a => a.User).ThenInclude(a=>a.Replies).ToList();
+            if (message == null)
+            {
+                return NotFound();
+            }
+
+            return PartialView("_Message", message);
+
+
         }
     }
     public class ReplyVM

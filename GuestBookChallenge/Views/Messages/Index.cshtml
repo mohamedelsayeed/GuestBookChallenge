@@ -9,7 +9,7 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a data-toggle="modal" href="#createMessageModal">Create New</a>
 </p>
 
 
@@ -19,7 +19,7 @@
             @foreach (var item in Model)
             {
                 <div class="col-lg-6">
-                    <div class="cardbox shadow-lg bg-white">
+                    <div class="cardbox shadow-lg bg-white" id="messagesDiv">
 
                         <div class="cardbox-heading">
                             @if (item.UserId == loggedUser)
@@ -63,22 +63,19 @@
 
                                     }
 
-                                    <div class="pad-ver">
-
-                                        <a class="btn btn-sm btn-default btn-hover-primary" href="#">Comment</a>
-                                    </div>
+                                  
                                     <hr>
                                 </div>
                             </div>
 
                         </div>
 
-                       
+
                         <div class="panel">
                             <div class="panel-body">
                                 <form id="replyForm_@item.Id">
                                     <input type="hidden" name="MessageId" value="@item.Id">
-                                    <input type="hidden" name="UserId" value="@item.UserId">
+                                    <input type="hidden" name="UserId" value="@loggedUser">
                                     <textarea class="form-control" type="text" name="Body" rows="2" placeholder="Add Reply..."></textarea>
                                     <div class="mar-top clearfix">
                                         <button class="btn btn-sm btn-primary pull-right" onclick="addReply(@item.Id);" type="button"><i class="fa fa-pencil fa-fw"></i>Reply</button>
@@ -90,55 +87,57 @@
                                 </form>
                             </div>
                         </div>
-                      
+
                         <div id="replyPartial_@item.Id">
-                        @if (item.Replies != null && item.Replies.Count() > 0)
-                        {
+                            @if (item.Replies != null && item.Replies.Count() > 0)
+                            {
 
-                            <div class="media-block pad-all">
+                                <div class="media-block pad-all">
 
-                                @foreach (var reply in Model.OrderByDescending(a => a.CreatedDate))
-                                {
-                                    <hr>
-
-                                    @if (string.IsNullOrEmpty(reply.User.ProfilePic))
+                                    @foreach (var reply in item.Replies.OrderByDescending(a => a.CreatedDate))
                                     {
-                                        <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/avatar.jpg" alt="User"></a>
-                                    }
-                                    else
-                                    {
-                                        <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/@reply.User.ProfilePic" alt="User"></a>
+                                        <hr>
 
-                                    }
-                                    <div class="media-body">
-                                        <div class="mar-btm">
-                                            <a href="#" class="btn-link text-semibold media-heading box-inline">@reply.User.Name</a>
-                                            <p class="text-muted text-sm"><i class="fa fa-globe fa-lg"></i> -- @((DateTime.Now - reply.CreatedDate).Hours))  min ago</p>
-                                        </div>
-                                        <p>@reply.Body</p>
-                                        @if (!string.IsNullOrEmpty(reply.Pic))
+                                        @if (string.IsNullOrEmpty(reply.User.ProfilePic))
                                         {
-                                            <img class="img-responsive thumbnail" src="~/Uploads/@reply.Pic" alt="@reply.Pic">
+                                            <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/avatar.jpg" alt="User"></a>
+                                        }
+                                        else
+                                        {
+                                            <a class="media-left" href=""><img class="img-circle img-sm" src="~/Uploads/@reply.User.ProfilePic" alt="User"></a>
 
                                         }
+                                        <div class="media-body">
+                                            <div class="mar-btm">
+                                                <a href="#" class="btn-link text-semibold media-heading box-inline">@reply.User.Name</a>
+                                                <p class="text-muted text-sm"><i class="fa fa-globe fa-lg"></i> -- @((DateTime.Now - reply.CreatedDate).Hours))  min ago</p>
+                                            </div>
+                                            <p>@reply.Body</p>
+                                            @if (!string.IsNullOrEmpty(reply.Pic))
+                                            {
+                                                <img class="img-responsive thumbnail" src="~/Uploads/@reply.Pic" alt="@reply.Pic">
 
-                                    </div>
+                                            }
 
-                                }
-                                <hr>
+                                        </div>
 
-                            </div>
-                        }        
+                                    }
+                                    <hr>
+
+                                </div>
+                            }
                         </div>
 
                     </div>
+                   <hr />
+
                 </div>
             }
         </div>
     </div>
 </section>
 
-<div class="modal" id="myModal" tabindex="-1" role="dialog">
+<div class="modal" id="replyModal" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -153,61 +152,142 @@
         </div>
     </div>
 </div>
+
+<div class="modal" id="createMessageModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form action="Messages/Create" id="messageForm" enctype="multipart/form-data">
+                    <input type="hidden" name="UserId" value="@loggedUser">
+
+                    <div class="form-group">
+                        <label class="control-label">Title</label>
+                        <input name="Title" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Body</label>
+                        <input name="Body" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <input type="file" id="MessagePic" name="Pic" class="form-control" accept=".png, .jpg" />
+
+                    </div>
+
+                    <div class="form-group">
+                        <input type="reset" onclick="CreateMessage();" data-dismiss="modal" value="Create" class="btn btn-primary" />
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 @section Scripts {
 
 
 <script>
-    function RenderMessage(id){
-        console.log("rendermessage" + id)
-      $.ajax({
-        url: '/Messages/GetData?id=' + id,
-        type: 'GET',
-        success: function (data) {
-         $('#replyPartial_'+id).empty();
-console.log(data)
-            $('#replyPartial_'+id).html(data);
-        }
+function RenderMessage(id){
+    console.log("rendermessage" + id)
+    $.ajax({
+    url: '/Messages/GetData?id=' + id,
+    type: 'GET',
+    success: function (data) {
+        $('#replyPartial_'+id).empty();
+        $('#replyPartial_'+id).html(data);
+    }
     });
-    }
-    function addReply(formid){
-       _formdata = new FormData();
-       
-        _formdata.append("UserId", $(`#replyForm_${formid} input[name=UserId]`).val());
-        _formdata.append("MessageId", $(`#replyForm_${formid} input[name=MessageId]`).val());
-        _formdata.append("Body", $(`#replyForm_${formid} textarea[name=Body]`).val());
-        var picFile = document.getElementById('Pic_'+ formid).files[0];
-        _formdata.append("Pic", picFile);
+}
+        function addReply(formid){
+           _formdata = new FormData();
 
-        $.ajax({
-            url: "/Messages/AddReply",
-            data: _formdata,
-            type: 'POST',
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            success: function(data) {
-               if(data == "1"){
-                $(`#replyForm_${formid}`)[0].reset();
-                document.getElementById('modalPar').innerHTML = "added"
-                $('#myModal').modal('toggle')
-                 setTimeout(function () {
-                    $('#myModal').modal('toggle');
-                }, 2000);
-                RenderMessage(formid)
-               }
-               else{
-               document.getElementById('modalPar').innerHTML = "error"
+            _formdata.append("UserId", $(`#replyForm_${formid} input[name=UserId]`).val());
+            _formdata.append("MessageId", $(`#replyForm_${formid} input[name=MessageId]`).val());
+            _formdata.append("Body", $(`#replyForm_${formid} textarea[name=Body]`).val());
+            var picFile = document.getElementById('Pic_'+ formid).files[0];
+            _formdata.append("Pic", picFile);
 
-                $('#myModal').modal('toggle')
-                 setTimeout(function () {
-                    $('#myModal').modal('toggle');
-                }, 2000);
-               }
+            $.ajax({
+                url: "/Messages/AddReply",
+                data: _formdata,
+                type: 'POST',
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                   if(data == "1"){
+                    $(`#replyForm_${formid}`)[0].reset();
+                    document.getElementById('modalPar').innerHTML = "added"
+                    $('#replyModal').modal('toggle')
+                     setTimeout(function () {
+                        $('#replyModal').modal('toggle');
+                    }, 2000);
+                    RenderMessage(formid)
+                   }
+                   else{
+                   document.getElementById('modalPar').innerHTML = "error"
 
-            }
-        });
-    }
+                    $('#replyModal').modal('toggle')
+                     setTimeout(function () {
+                        $('#replyModal').modal('toggle');
+                    }, 2000);
+                   }
 
+                }
+            });
+        }
+
+         function CreateMessage(){
+           _formdata = new FormData();
+
+            _formdata.append("UserId", $(`#messageForm input[name=UserId]`).val());
+            _formdata.append("Title", $(`#messageForm input[name=Title]`).val());
+            _formdata.append("Body", $(`#messageForm input[name=Body]`).val());
+            var picFile = document.getElementById('MessagePic').files[0];
+            _formdata.append("Pic", picFile);
+
+            $.ajax({
+                url: "/Messages/Create",
+                data: _formdata,
+                type: 'POST',
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function(data) {
+                    if(data == "-1"){
+                        document.getElementById('modalPar').innerHTML = "error"
+
+                        $('#replyModal').modal('show')
+                         setTimeout(function () {
+                            $('#replyModal').modal('hide');
+                        }, 2000);
+                   }
+                    else {
+                         RenderNewMessage(data)
+                        
+                   }
+                   
+
+                }
+            });
+        }
+function RenderNewMessage(id){
+    console.log("RenderNewMessage" + id)
+    $.ajax({
+    url: '/Messages/GetMessage?id=' + id,
+    type: 'GET',
+    success: function (data) {
+       console.log(data)
+        $('#messagesDiv').append(data);
+    },
+        error: function (ex) { console.log(ex); },
+    });
+}
 
 </script>
 }
