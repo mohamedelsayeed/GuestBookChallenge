@@ -259,8 +259,9 @@ function RenderMessage(id){
                 processData: false,
                 contentType: false,
                 success: function(data) {
-                    if(data == "-1"){
-                        document.getElementById('modalPar').innerHTML = "error"
+
+                    if(data.response == "-1"){
+                        document.getElementById('modalPar').innerHTML = data.msg
 
                         $('#replyModal').modal('show')
                          setTimeout(function () {
@@ -268,12 +269,13 @@ function RenderMessage(id){
                         }, 2000);
                    }
                     else {
-                         RenderNewMessage(data)
+                         RenderNewMessage(data.response)
                         
                    }
                    
 
-                }
+                },
+                 error: function (ex) { console.log(ex); },
             });
         }
 function RenderNewMessage(id){

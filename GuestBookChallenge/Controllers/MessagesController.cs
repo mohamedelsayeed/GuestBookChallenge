@@ -15,7 +15,7 @@ namespace GuestBookChallenge.Controllers
     {
         private readonly AppDbContext _context;
         private readonly Microsoft.AspNetCore.Hosting.IHostingEnvironment _appEnvironment;
-
+        Respone respone = new Respone();
         public MessagesController(AppDbContext context, IHostingEnvironment appEnvironment)
         {
             _context = context;
@@ -25,11 +25,11 @@ namespace GuestBookChallenge.Controllers
         public IActionResult Index()
         {
             var uid = HttpContext.Session.GetInt32("UID");
-            if(uid == null)
+            if (uid == null)
             {
-                return RedirectToAction("Login","Account");
+                return RedirectToAction("Login", "Account");
             }
-            ViewData["UserId"]  = uid;
+            ViewData["UserId"] = uid;
             var appDbContext = _context.Messages.Include(m => m.User).ThenInclude(m => m.Replies).ToList();
             return View(appDbContext);
         }
@@ -52,11 +52,11 @@ namespace GuestBookChallenge.Controllers
             return View(message);
         }
 
-        public IActionResult Create()
-        {
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name");
-            return View();
-        }
+        //public IActionResult Create()
+        //{
+        //    ViewData["UserId"] = new SelectList(_context.Users, "Id", "Name");
+        //    return View();
+        //}
 
         [HttpPost]
         public IActionResult Create(Message message)
@@ -97,17 +97,17 @@ namespace GuestBookChallenge.Controllers
                     _context.Add(message);
                     _context.SaveChanges();
                 }
+                respone.response = message.Id;
+                respone.msg = "saved";
+                return Json(respone);
             }
             catch (Exception ex)
             {
-
-                return Json("-1");
+                respone.response = -1;
+                respone.msg = "error";
+                return Json(respone);
             }
-            var uid = HttpContext.Session.GetInt32("UID");
-            
-            //ViewData["UserId"] = uid;
-            //var model = _context.Messages.Where(a=>a.Id == message.Id).Include(a=>a.User).ThenInclude(a=>a.Replies).FirstOrDefault();
-            return Json(message.Id, new Newtonsoft.Json.JsonSerializerSettings());
+
         }
         [HttpPost]
         public IActionResult AddReply(ReplyVM reply)
@@ -164,7 +164,7 @@ namespace GuestBookChallenge.Controllers
             return View(message);
         }
 
-       
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Edit(int id, [Bind("Id,Title,Body,UserId")] Message message)
@@ -221,7 +221,7 @@ namespace GuestBookChallenge.Controllers
         public IActionResult DeleteConfirmed(int id)
         {
             var message = _context.Messages.Find(id);
-            var replies = _context.Replys.Where(a=>a.MessageId == id);
+            var replies = _context.Replys.Where(a => a.MessageId == id);
 
             _context.Replys.RemoveRange(replies);
 
@@ -237,14 +237,14 @@ namespace GuestBookChallenge.Controllers
 
 
         [HttpGet]
-        public IActionResult GetData(int? id=2)
+        public IActionResult GetData(int? id = 2)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var reply = _context.Replys.Where(a=>a.MessageId ==  id).Include(a => a.User).ToList();
+            var reply = _context.Replys.Where(a => a.MessageId == id).Include(a => a.User).ToList();
             if (reply == null)
             {
                 return NotFound();
@@ -252,7 +252,7 @@ namespace GuestBookChallenge.Controllers
 
             return PartialView("_reply", reply);
 
-           
+
         }
         [HttpGet]
         public IActionResult GetMessage(int? id = 2)
@@ -262,11 +262,14 @@ namespace GuestBookChallenge.Controllers
                 return NotFound();
             }
 
-            var message = _context.Messages.Where(a => a.Id == id).Include(a => a.User).ThenInclude(a=>a.Replies).ToList();
+            var message = _context.Messages.Where(a => a.Id == id).Include(a => a.User).ThenInclude(a => a.Replies).FirstOrDefault();
             if (message == null)
             {
                 return NotFound();
             }
+            var uid = HttpContext.Session.GetInt32("UID");
+
+            ViewData["UserId"] = uid;
 
             return PartialView("_Message", message);
 
